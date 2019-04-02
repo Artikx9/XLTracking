@@ -1,0 +1,73 @@
+<resources>
+    <string name="app_name">XlTracker</string>
+    <string name="switch_run">Service on\\off</string>
+    <string name="port">Port:</string>
+    <string name="server">Server:</string>
+    <string name="general">General</string>
+    <string name="data_list">Data list</string>
+    <string name="additional">Additional settings</string>
+    <string name="time_reg_data">Period registration data,sec.:</string>
+    <string name="time_send_data">Period sending data,sec.:</string>
+    <string name="second">sec.</string>
+    <string name="list_latitude_longitude">Latitude,Longitude</string>
+    <string name="list_angle">Angle</string>
+    <string name="list_speed">Speed</string>
+    <string name="list_satellites">Satellites</string>
+    <string name="list_loc_area_code">Location area code,Cell ID</string>
+    <string name="list_gsm_signal_quality">GSM signal quality</string>
+    <string name="list_operator_code">Operator code</string>
+    <string name="list_altitude">Altitude</string>
+    <string name="btn_options">Options</string>
+    <string name="btn_exit">Exit</string>
+    <string name="min_distance_provider">Min distance:</string>
+    <string name="min_distance_provider_summary">Min distance between location updates, in meters.</string>
+    <string name="title_activity_settings" translatable="false">Settings</string>
+
+    <string name="notification_title">Xltracker is active</string>
+    <string name="notification_message">Click to go to the app</string>
+    <string name="ticker_text">Xltracker is start</string>
+    <string name="name_intent_service" translatable="false">Service_tracking</string>
+    <string name="title_location_permission">Request Permission</string>
+    <string name="text_location_permission">For the correct operation of the program you need permissions.</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="wrong_data">Wrong data</string>
+    <string name="title_enable_gps">Geolocation not enabled.</string>
+    <string name="text_enable_gps">To improve the accuracy of the program, enable geolocation.</string>
+
+    <string name="title_dialog_preference">Invalid parameter value.</string>
+    <string name="text_dialog_preference">Enter the correct value for the parameter (number).</string>
+    <string name="gps_and_wifi">Use gps + wi-fi</string>
+    <string name="notification_ticker_task_bd">Caution!Database limit exceeded.</string>
+    <string name="notification_message_task_bd">The number of records in the database has been reached</string>
+    <string name="notification_message_task_server_connect">Check the settings, or contact support.</string>
+    <string name="notification_message_task_server_internet">To send data, turn on the Internet.</string>
+    <string name="notification_title_task_server_internet">No internet.</string>
+    <string name="notification_title_task_server_connect">No connection to the server.</string>
+    <string name="notification_ticker_task_server_connect">Caution!No connection to the server.</string>
+    <string name="notification_title_task_bd">"Limit is exceeded "</string>
+    <string name="listView_imei" translatable="false">IMEI:</string>
+    <string name="listView_data">Data collection:</string>
+    <string name="on">on</string>
+    <string name="off">off</string>
+    <string name="listView_sat">Number of satellites:</string>
+    <string name="notification_ticker_task_server_imei">Caution!Unregistered IMEI.</string>
+    <string name="notification_title_task_server_imei">Unregistered IMEI.</string>
+    <string name="notification_message_task_server_imei">Please contact support.</string>
+    <string name="notification_ticker_task_server_internet">Caution!No internet.</string>
+    <string name="list_battery">Battery charge</string>
+    <string name="notification_title_enable_gps">Geolocation not enabled.</string>
+    <string name="notification_ticker_enable_gps">Caution!</string>
+    <string name="notification_message_enable_gps">To improve the accuracy of the program, enable geolocation.</string>
+    <string name="sending_without_gps">Sending without GPS fix</string>
+    <string name="send_without_gps_summary">Send data in the absence of coordinates</string>
+    <string name="block_password_setting_summary">Block password change settings</string>
+    <string name="block_password_setting">Set password</string>
+    <string name="key_authorization_title">Key authorization</string>
+    <string name="password_dialog_textView">Enter the password to access the settings:</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+</resources>
