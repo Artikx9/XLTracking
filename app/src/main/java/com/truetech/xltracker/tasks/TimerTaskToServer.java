@@ -133,7 +133,7 @@ public class TimerTaskToServer extends TimerTask {
         DataInputStream sockIn=null;
         response=MINUS_ONE;
         try {
-            serverAddr = InetAddress.getByName(getStringFromPref(R.string.key_port));
+            serverAddr = InetAddress.getByName(getStringFromPref(R.string.key_server));
             socket = new Socket(serverAddr, getIntFromPref(R.string.key_port));
             socket.setSoTimeout(SOCKET_TIMEOUT);
             sockOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
