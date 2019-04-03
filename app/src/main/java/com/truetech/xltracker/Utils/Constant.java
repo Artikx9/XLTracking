@@ -37,7 +37,8 @@ public class Constant {
     public static final String TAG="XLTracker";
     //public static final String HOST="192.168.1.40";
     //public static final String HOST="77.244.216.154";
-
+    public static final byte BYTE_MOBILE_ONE=0x23;
+    public static final byte BYTE_MOBILE_TWO=0x4d;
     private Constant() {
     }
 }

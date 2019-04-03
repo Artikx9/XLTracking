@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.location.Criteria;
+import android.location.GnssStatus;
 import android.location.GpsStatus;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
@@ -40,6 +41,7 @@ public class TrackerService extends Service {
     private LocationManager locManager = null;
     private ILocListener locationListener = null;
     private GpsStatus.Listener satListener = null;
+    private GnssStatus.Callback satListenerV24 = null;
     private IAzimuthSensorListener azimuthListener = null;
     private MyPhoneStateListener mPhoneStateListener=null;
     private TelephonyManager mTelephonyManager;

@@ -1,13 +1,10 @@
 package com.truetech.xltracker.listener;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.pm.PackageManager;
-import android.location.GpsSatellite;
-import android.location.GpsStatus;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.support.v4.app.ActivityCompat;
+import android.content.Context;
+import android.location.*;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import com.truetech.xltracker.R;
 import com.truetech.xltracker.service.TrackerService;
 
@@ -26,6 +23,7 @@ public class SatellitesInfo implements GpsStatus.Listener {
     private TrackerService service = null;
     public static volatile int satellitesInFix = 0;
 
+    @SuppressLint("MissingPermission")
     public SatellitesInfo(TrackerService service) {
         this.service = service;
         this.locManager = service.getLocManager();

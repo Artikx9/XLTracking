@@ -11,13 +11,11 @@ import com.truetech.xltracker.data.DBHelper;
 import com.truetech.xltracker.service.TrackerService;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 import static com.truetech.xltracker.Utils.Constant.*;
 import static com.truetech.xltracker.Utils.Util.*;
@@ -138,8 +136,14 @@ public class TimerTaskToServer extends TimerTask {
             socket.setSoTimeout(SOCKET_TIMEOUT);
             sockOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
             byte[] imei = getStringFromPref(IMEI).getBytes(StandardCharsets.US_ASCII);
-            sockOut.writeShort(imei.length);
-            sockOut.write(imei);
+            byte[] imeiSend = new byte[imei.length+2];
+            imeiSend[0] = BYTE_MOBILE_ONE;
+            imeiSend[1] = BYTE_MOBILE_TWO;
+            for (int i = 0; i <imei.length ; i++) {
+                imeiSend[i+2] = imei[i];
+            }
+            sockOut.writeShort(imeiSend.length);
+            sockOut.write(imeiSend);
             sockOut.flush();
             request = MINUS_ONE;
             sockIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
