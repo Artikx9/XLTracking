@@ -17,6 +17,8 @@ import com.truetech.xltracker.service.TrackerService;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.io.FileOutputStream;
+import java.nio.ByteBuffer;
 import java.util.TimerTask;
 
 import static com.truetech.xltracker.Utils.Constant.*;
@@ -77,6 +79,91 @@ public class TimerTaskBD extends TimerTask {
         return prefs;
     }
 
+//    private void createInsert() {
+//        Location loc = locListener.getCurrentLoc();
+//        boolean[] prefs = readPref(loc);
+//        if (loc == null && !prefs[9]) return;
+//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        DataOutputStream daos = new DataOutputStream(new BufferedOutputStream(baos));
+//        ContentValues cv = new ContentValues();
+//        SQLiteDatabase db;
+//        try {
+//           daos.write(getPriorityAndTimeStamp());
+//            if (prefs[8]) {//battery_energy
+//                daos.writeByte(GLOBAL_MASK);
+//            } else {
+//                daos.writeByte(GLOBAL_MASK_WITHOUT_IO);
+//            }
+//            int mask = 255;//in binary string ==1111 111
+//            mask = setBitInByte(mask, 7, prefs[7]);
+//            mask = setBitInByte(mask, 6, prefs[6]);
+//            mask = setBitInByte(mask, 5, prefs[5]);
+//            mask = setBitInByte(mask, 4, prefs[4]);
+//            if (loc == null) loc = getLastCopords();
+//            if (loc != null) {
+//                mask = setBitInByte(mask, 3, prefs[3]);
+//                mask = setBitInByte(mask, 2, prefs[2]);
+//                mask = setBitInByte(mask, 1, prefs[1]);
+//                mask = setBitInByte(mask, 0, prefs[0]);
+//                daos.writeByte(mask);
+//                if (prefs[0]) {     //latitude
+//                    daos.writeInt(parseFloatToIntInIEEE754(loc.getLatitude()));
+//                    daos.writeInt(parseFloatToIntInIEEE754(loc.getLongitude()));
+//                }
+//                if (prefs[1]) {
+//                    short altitude = getAltitude(loc);//altitude
+//                    daos.writeShort(altitude);
+//                }
+//                if (prefs[2]) {//angle
+//                    float angle = getAngle(loc);
+//                    daos.writeByte((int) (angle * 256 / 360));
+//                }
+//                if (prefs[3]) {//speed
+//                    daos.writeByte((int) loc.getSpeed());
+//                }
+//            } else {
+//                mask = setBitInByte(mask, 3, false);//speed
+//                mask = setBitInByte(mask, 2, false);//angle
+//                mask = setBitInByte(mask, 1, false);//altitude
+//                mask = setBitInByte(mask, 0, false);//latitude,longitude
+//                daos.writeByte(mask);
+//            }
+//
+//            if (prefs[4]) {//satellites
+//                daos.writeByte(satellitesInFix);
+//            }
+//            if (prefs[5]) {//loc_area_code
+//                int[] array = getLacAndCid();             //cell id
+//                daos.writeShort(array[0]);//write local area code
+//                daos.writeShort(array[1]);//write cell ID
+//            }
+//            if (prefs[6]) {//gsm_signal
+//                daos.writeByte(strength);
+//
+//            }
+//            if (prefs[7]) {//operator_code
+//                daos.writeInt(getOperatorCode());
+//            }
+//            if (prefs[8]) {//battery_energy
+//                //Write IOElement
+//                //Write Battery level in percentage
+//                daos.writeByte(HEX_ONE);//write Quantity
+//                daos.writeByte(HEX_ONE);//write ID Battery level
+//                daos.writeByte(getBatteryPercentage(service));//write battery level percentage
+//            }
+//            daos.flush();
+//            byte[] bytes = baos.toByteArray();
+//            cv.put(COL_DATA, bytes);
+//            cv.put(COL_DATE_INSERT, System.currentTimeMillis() / 1000);
+//            db = dbHelper.getWritableDatabase();
+//            db.insert(NAME_TABLE_LOC, null, cv);
+//        } catch (Exception e) {
+//            Log.e(TAG, "Write byteArrayOutputStream in TimerTaskBD", e);
+//        } finally {
+//            closeStream(daos, baos);
+//        }
+//    }
+
     private void createInsert() {
         Location loc = locListener.getCurrentLoc();
         boolean[] prefs = readPref(loc);
@@ -86,50 +173,25 @@ public class TimerTaskBD extends TimerTask {
         ContentValues cv = new ContentValues();
         SQLiteDatabase db;
         try {
-            daos.write(getPriorityAndTimeStamp());
-            if (prefs[8]) {//battery_energy
-                daos.writeByte(GLOBAL_MASK);
-            } else {
-                daos.writeByte(GLOBAL_MASK_WITHOUT_IO);
+            if (prefs[0]) {     //latitude and Longitude
+                daos.writeDouble(loc.getLongitude());
+                daos.writeDouble(loc.getLatitude());
             }
-            int mask = 255;//in binary string ==1111 111
-            mask = setBitInByte(mask, 7, prefs[7]);
-            mask = setBitInByte(mask, 6, prefs[6]);
-            mask = setBitInByte(mask, 5, prefs[5]);
-            mask = setBitInByte(mask, 4, prefs[4]);
-            if (loc == null) loc = getLastCopords();
-            if (loc != null) {
-                mask = setBitInByte(mask, 3, prefs[3]);
-                mask = setBitInByte(mask, 2, prefs[2]);
-                mask = setBitInByte(mask, 1, prefs[1]);
-                mask = setBitInByte(mask, 0, prefs[0]);
-                daos.writeByte(mask);
-                if (prefs[0]) {     //latitude
-                    daos.writeInt(parseFloatToIntInIEEE754(loc.getLatitude()));
-                    daos.writeInt(parseFloatToIntInIEEE754(loc.getLongitude()));
-                }
-                if (prefs[1]) {
-                    short altitude = getAltitude(loc);//altitude
-                    daos.writeShort(altitude);
-                }
-                if (prefs[2]) {//angle
+            if (prefs[1]) {//altitude
+                short altitude = getAltitude(loc);
+                daos.writeShort(altitude);
+            }
+            if (prefs[2]) {//angle
                     float angle = getAngle(loc);
-                    daos.writeByte((int) (angle * 256 / 360));
-                }
-                if (prefs[3]) {//speed
-                    daos.writeByte((int) loc.getSpeed());
-                }
-            } else {
-                mask = setBitInByte(mask, 3, false);//speed
-                mask = setBitInByte(mask, 2, false);//angle
-                mask = setBitInByte(mask, 1, false);//altitude
-                mask = setBitInByte(mask, 0, false);//latitude,longitude
-                daos.writeByte(mask);
+                    daos.write(ByteBuffer.allocate(2).putFloat(angle).array());
             }
-
             if (prefs[4]) {//satellites
                 daos.writeByte(satellitesInFix);
             }
+            if (prefs[3]) {//speed
+                    float speed = loc.getSpeed();
+                    daos.write(ByteBuffer.allocate(2).putFloat(speed).array());
+              }
             if (prefs[5]) {//loc_area_code
                 int[] array = getLacAndCid();             //cell id
                 daos.writeShort(array[0]);//write local area code

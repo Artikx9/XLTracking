@@ -15,7 +15,8 @@ public class Constant {
     public static final String LIMIT_TRY_CONNECT="try_connect";
     public static final byte HEX_ONE=0x01;
     public static final byte HEX_NULL=0x00;
-    public static final byte CODEC_ID=0x07;
+    public static final byte CODEC_ID=0x08;
+    public static final byte PRIORITY=0x00;
     public static final byte MINUS_ONE=-1;
     public static final byte[] PREAMBLE=new byte[]{0,0,0,0};
     public static final int GLOBAL_MASK= 3;// in binary 0000 0011

@@ -14,7 +14,9 @@ import java.io.*;
 import java.lang.reflect.Array;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 import java.util.*;
 
 import static com.truetech.xltracker.Utils.Constant.*;
@@ -73,56 +75,58 @@ public class TimerTaskToServer extends TimerTask {
         timerServer.schedule(task,period*THOUSAND,period*THOUSAND);
     }
 
-    private byte[] createPacket(){
-        byte[] bytes=null;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DataOutputStream daos = new DataOutputStream(new BufferedOutputStream(baos));
-        try {
-            daos.write(PREAMBLE);
-            byte[] data=getDataPacket();
-            daos.writeInt(data.length);
-            daos.write(data);
-            daos.writeInt(getCrc16(data));
-            daos.flush();
-            bytes=baos.toByteArray();
-        } catch (Exception e) {
-            Log.e(TAG,"Method 'createPacket' in TimerTaskToServer",e);
-        }finally {
-            closeStream(baos,daos);
-        }
-        return bytes;
-    }
-    private byte[] getDataPacket(){
-        list=new ArrayList<>();
-        byte[] bytes=null;
-        SQLiteDatabase db;
-        Cursor c=null;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DataOutputStream daos = new DataOutputStream(new BufferedOutputStream(baos));
-        try {
-            daos.writeByte(CODEC_ID);
-            db = dbHelper.getWritableDatabase();
-            c=db.query(NAME_TABLE_LOC,new String[]{COL_ID,COL_DATA},null,null,null,null,COL_DATE_INSERT,String.valueOf(MAX_LENGTH_RECORDS));
-            daos.writeByte(c.getCount());
-            if (c.moveToFirst()){
-                int id=c.getColumnIndexOrThrow(COL_ID);
-                int idColData=c.getColumnIndexOrThrow(COL_DATA);
-                do {
-                    daos.write(c.getBlob(idColData));
-                    list.add(c.getInt(id));
-                }while (c.moveToNext());
-            }
-            daos.writeByte(c.getCount());
-            daos.flush();
-            bytes=baos.toByteArray();
-        } catch (Exception e) {
-            Log.e(TAG,"Create data packet in method 'gatDataPacket' in TimerTaskToServer",e);
-        } finally {
-            if (c!=null && !c.isClosed()) c.close();
-            closeStream(daos,baos);
-        }
-        return bytes;
-    }
+//    private byte[] createPacket(){
+//        byte[] bytes=null;
+//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        DataOutputStream daos = new DataOutputStream(new BufferedOutputStream(baos));
+//        try {
+//            daos.write(PREAMBLE);
+//            byte[] data=getDataPacket();
+//            daos.writeInt(data.length);
+//            daos.write(data);
+//            daos.writeInt(getCrc16(data));
+//            daos.flush();
+//            bytes=baos.toByteArray();
+//        } catch (Exception e) {
+//            Log.e(TAG,"Method 'createPacket' in TimerTaskToServer",e);
+//        }finally {
+//            closeStream(baos,daos);
+//        }
+//        return bytes;
+//    }
+//    private byte[] getDataPacket(){
+//        list=new ArrayList<>();
+//        byte[] bytes=null;
+//        SQLiteDatabase db;
+//        Cursor c=null;
+//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        DataOutputStream daos = new DataOutputStream(new BufferedOutputStream(baos));
+//        try {
+//            daos.writeByte(CODEC_ID);
+//            db = dbHelper.getWritableDatabase();
+//            c=db.query(NAME_TABLE_LOC,new String[]{COL_ID,COL_DATA},null,null,null,null,COL_DATE_INSERT,String.valueOf(MAX_LENGTH_RECORDS));
+//            daos.writeByte(c.getCount());
+//            if (c.moveToFirst()){
+//                int id=c.getColumnIndexOrThrow(COL_ID);
+//                int idColData=c.getColumnIndexOrThrow(COL_DATA);
+//                do {
+//                    daos.write(c.getBlob(idColData));
+//                    list.add(c.getInt(id));
+//                }while (c.moveToNext());
+//            }
+//            daos.writeByte(c.getCount());
+//            daos.flush();
+//            bytes=baos.toByteArray();
+//        } catch (Exception e) {
+//            Log.e(TAG,"Create data packet in method 'gatDataPacket' in TimerTaskToServer",e);
+//        } finally {
+//            if (c!=null && !c.isClosed()) c.close();
+//            closeStream(daos,baos);
+//        }
+//        return bytes;
+//    }
+
+
     private int sendToServer(){
         InetAddress serverAddr;
         //boolean result=false;
@@ -162,8 +166,8 @@ public class TimerTaskToServer extends TimerTask {
                     return response;
                 }
             }
-            byte[] packet = createPacket();
-            sockOut.write(packet);
+            byte[] AVLpacket = createAVLPacket();
+            sockOut.write(AVLpacket);
             sockOut.flush();
             while (true) {
                 try {
@@ -193,6 +197,84 @@ public class TimerTaskToServer extends TimerTask {
         }
         return response;
     }
+
+    private byte[] createAVLPacket() {
+        byte[] bytes=null;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream daos = new DataOutputStream(new BufferedOutputStream(baos));
+        try {
+            daos.write(PREAMBLE);
+            byte[] data=getAVLDataArray();
+            daos.writeInt(data.length);
+            daos.write(data);
+            daos.writeInt(getCrc16(data));
+            daos.flush();
+            bytes=baos.toByteArray();
+        } catch (Exception e) {
+            Log.e(TAG,"Method 'createAVLPacket' in TimerTaskToServer",e);
+        }finally {
+            closeStream(baos,daos);
+        }
+        return bytes;
+    }
+
+    private byte[] getAVLDataArray() {
+        list=new ArrayList<>();
+        byte[] bytes=null;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream daos = new DataOutputStream(new BufferedOutputStream(baos));
+        try {
+            daos.writeByte(CODEC_ID);
+            daos.writeByte(0x01);
+            daos.write(getAVLData());
+            daos.writeByte(0x01);
+            daos.flush();
+            bytes=baos.toByteArray();
+        } catch (Exception e) {
+            Log.e(TAG,"Create data packet in method 'getAVLDataArray' in TimerTaskToServer",e);
+        } finally {
+            closeStream(daos,baos);
+        }
+        return bytes;
+    }
+
+    private byte[] getAVLData() {
+        list=new ArrayList<>();
+        byte[] bytes=null;
+        SQLiteDatabase db;
+        Cursor c=null;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream daos = new DataOutputStream(new BufferedOutputStream(baos));
+        try {
+            daos.write(getTimestamp());
+            daos.writeByte(PRIORITY);
+            db = dbHelper.getWritableDatabase();
+            c=db.query(NAME_TABLE_LOC,new String[]{COL_ID,COL_DATA},null,null,null,null,COL_DATE_INSERT,String.valueOf(MAX_LENGTH_RECORDS));
+            daos.writeByte(c.getCount());
+            if (c.moveToFirst()){
+                int id=c.getColumnIndexOrThrow(COL_ID);
+                int idColData=c.getColumnIndexOrThrow(COL_DATA);
+                do {
+                    daos.write(c.getBlob(idColData));
+                    list.add(c.getInt(id));
+                }while (c.moveToNext());
+            }
+            daos.flush();
+            bytes=baos.toByteArray();
+        } catch (Exception e) {
+            Log.e(TAG,"Create data packet in method 'gatDataPacket' in TimerTaskToServer",e);
+        } finally {
+            if (c!=null && !c.isClosed()) c.close();
+            closeStream(daos,baos);
+        }
+        return bytes;
+    }
+
+    private byte[] getTimestamp() {
+        int dateInSec = (int) (System.currentTimeMillis() / 1000);
+        return ByteBuffer.allocate(8).putInt(dateInSec).array();
+    }
+
     private void deleteRowsInBd(List<Integer> listIds){
         if (listIds.size()!=response){
             listIds=listIds.subList(0,min(listIds.size(),response));
