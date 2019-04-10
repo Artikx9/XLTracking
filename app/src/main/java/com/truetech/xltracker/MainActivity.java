@@ -158,6 +158,7 @@ public class MainActivity extends AppCompatActivity {
         dataListView.add(getString(R.string.listView_sat)+satellitesInFix);
         adapter=new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, dataListView);
         lvMain= findViewById(R.id.key_listView_main);
+        if(adapter != null)
         lvMain.setAdapter(adapter);
     }
 

@@ -65,7 +65,6 @@ public class TimerTaskBD extends TimerTask {
         prefs[9] = getBoolFromPref(R.string.key_send_without_gps);
         prefs[8] = getBoolFromPref(R.string.key_battery);
 
-        prefs[4] = getBoolFromPref(R.string.key_satellites);
         prefs[5] = getBoolFromPref(R.string.key_loc_area_code);
         prefs[6] = getBoolFromPref(R.string.key_gsm_signal);
         prefs[7] = getBoolFromPref(R.string.key_operator_code);
@@ -73,7 +72,9 @@ public class TimerTaskBD extends TimerTask {
             prefs[0] = getBoolFromPref(R.string.key_latitude);
             prefs[1] = getBoolFromPref(R.string.key_altitude);
             prefs[2] = getBoolFromPref(R.string.key_angle);
-            prefs[3] = getBoolFromPref(R.string.key_speed);
+            prefs[3] = getBoolFromPref(R.string.key_satellites);
+            prefs[4] = getBoolFromPref(R.string.key_speed);
+
         }
 
         return prefs;
@@ -165,6 +166,7 @@ public class TimerTaskBD extends TimerTask {
 //    }
 
     private void createInsert() {
+        double prec = 10000000D;
         Location loc = locListener.getCurrentLoc();
         boolean[] prefs = readPref(loc);
         if (loc == null && !prefs[9]) return;
@@ -172,45 +174,73 @@ public class TimerTaskBD extends TimerTask {
         DataOutputStream daos = new DataOutputStream(new BufferedOutputStream(baos));
         ContentValues cv = new ContentValues();
         SQLiteDatabase db;
+        byte N1 = 0x00;byte N2 = 0x00;byte N4 = 0x00;byte N8 = 0x00;
+        if(prefs[5]) N2++; //loc
+        if(prefs[5]) N2++; //celId
+        if(prefs[6]) N1++;
+        if(prefs[7]) N2++;
+        if(prefs[8]) N1++;
         try {
+
+            daos.write(getTimestamp());
+            daos.writeByte(PRIORITY);
+
+
+            /**GPS Element*/
             if (prefs[0]) {     //latitude and Longitude
-                daos.writeDouble(loc.getLongitude());
-                daos.writeDouble(loc.getLatitude());
+                daos.writeInt((int)(loc.getLongitude()*prec));
+                daos.writeInt((int)(loc.getLatitude()*prec));
             }
+
             if (prefs[1]) {//altitude
                 short altitude = getAltitude(loc);
                 daos.writeShort(altitude);
             }
             if (prefs[2]) {//angle
-                    float angle = getAngle(loc);
-                    daos.write(ByteBuffer.allocate(2).putFloat(angle).array());
+                float angle = getAngle(loc);
+                daos.writeShort((int)angle);
             }
-            if (prefs[4]) {//satellites
+            if (prefs[3]) {//satellites
                 daos.writeByte(satellitesInFix);
             }
-            if (prefs[3]) {//speed
-                    float speed = loc.getSpeed();
-                    daos.write(ByteBuffer.allocate(2).putFloat(speed).array());
-              }
-            if (prefs[5]) {//loc_area_code
-                int[] array = getLacAndCid();             //cell id
-                daos.writeShort(array[0]);//write local area code
-                daos.writeShort(array[1]);//write cell ID
+            if (prefs[4]) {//speed
+                float speed = loc.getSpeed();
+                daos.writeShort((int) speed);
             }
-            if (prefs[6]) {//gsm_signal
-                daos.writeByte(strength);
 
-            }
-            if (prefs[7]) {//operator_code
-                daos.writeInt(getOperatorCode());
+            /**IO Element*/
+            daos.writeByte(0x00); // EVENT ID IO
+            daos.writeByte(N1 + N2 + N4 + N8); //IO elements in record
+
+            daos.writeByte(N1); //  IO elements, which length is 1 Byte
+
+            if (prefs[6]) {//gsm_signal
+                daos.writeByte(15);
+                daos.writeByte(strength);
             }
             if (prefs[8]) {//battery_energy
-                //Write IOElement
-                //Write Battery level in percentage
-                daos.writeByte(HEX_ONE);//write Quantity
-                daos.writeByte(HEX_ONE);//write ID Battery level
+                daos.writeByte(98);
                 daos.writeByte(getBatteryPercentage(service));//write battery level percentage
             }
+
+            daos.writeByte(N2); //  IO elements, which value length is 2 Bytes
+
+            if (prefs[5]) {//loc_area_code
+                int[] array = getLacAndCid();             // array[1]cell id
+                daos.writeByte(0xCD);
+                daos.writeShort(array[1]);
+                daos.writeByte(0xCE);
+                daos.writeShort(array[0]);
+            }
+
+            if (prefs[7]) {//operator_code
+                daos.writeByte(0xF1);
+                daos.writeShort(getOperatorCode());
+            }
+            daos.writeByte(N4); // IO element, which value length is 4 Bytes
+
+            daos.writeByte(N8); // IO elements, which value length is 8 Bytes
+
             daos.flush();
             byte[] bytes = baos.toByteArray();
             cv.put(COL_DATA, bytes);
@@ -258,6 +288,12 @@ public class TimerTaskBD extends TimerTask {
         return angle;
     }
 
+    private byte[] getTimestamp() {
+       /* int dateInSec = (int) (System.currentTimeMillis() / 1000);
+        return ByteBuffer.allocate(8).putInt(dateInSec).array();*/
+        long time = System.currentTimeMillis() / 1000 - DIFF_UNIX_TIME;
+        return  ByteBuffer.allocate(8).putFloat(time).array();
+    }
 }
 
 

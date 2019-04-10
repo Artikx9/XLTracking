@@ -205,6 +205,7 @@ public class TimerTaskToServer extends TimerTask {
         try {
             daos.write(PREAMBLE);
             byte[] data=getAVLDataArray();
+            System.out.println(bytesToHex(data));
             daos.writeInt(data.length);
             daos.write(data);
             daos.writeInt(getCrc16(data));
@@ -221,13 +222,17 @@ public class TimerTaskToServer extends TimerTask {
     private byte[] getAVLDataArray() {
         list=new ArrayList<>();
         byte[] bytes=null;
+        SQLiteDatabase db;
+        Cursor c=null;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream daos = new DataOutputStream(new BufferedOutputStream(baos));
         try {
+            db = dbHelper.getWritableDatabase();
+            c=db.query(NAME_TABLE_LOC,new String[]{COL_ID,COL_DATA},null,null,null,null,COL_DATE_INSERT,String.valueOf(MAX_LENGTH_RECORDS));
             daos.writeByte(CODEC_ID);
-            daos.writeByte(0x01);
+            daos.writeByte(c.getCount());
             daos.write(getAVLData());
-            daos.writeByte(0x01);
+            daos.writeByte(c.getCount());
             daos.flush();
             bytes=baos.toByteArray();
         } catch (Exception e) {
@@ -246,11 +251,8 @@ public class TimerTaskToServer extends TimerTask {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream daos = new DataOutputStream(new BufferedOutputStream(baos));
         try {
-            daos.write(getTimestamp());
-            daos.writeByte(PRIORITY);
             db = dbHelper.getWritableDatabase();
             c=db.query(NAME_TABLE_LOC,new String[]{COL_ID,COL_DATA},null,null,null,null,COL_DATE_INSERT,String.valueOf(MAX_LENGTH_RECORDS));
-            daos.writeByte(c.getCount());
             if (c.moveToFirst()){
                 int id=c.getColumnIndexOrThrow(COL_ID);
                 int idColData=c.getColumnIndexOrThrow(COL_DATA);
@@ -270,10 +272,7 @@ public class TimerTaskToServer extends TimerTask {
         return bytes;
     }
 
-    private byte[] getTimestamp() {
-        int dateInSec = (int) (System.currentTimeMillis() / 1000);
-        return ByteBuffer.allocate(8).putInt(dateInSec).array();
-    }
+
 
     private void deleteRowsInBd(List<Integer> listIds){
         if (listIds.size()!=response){
