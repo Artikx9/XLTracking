@@ -140,11 +140,10 @@ public class TimerTaskToServer extends TimerTask {
             socket.setSoTimeout(SOCKET_TIMEOUT);
             sockOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
             byte[] imei = getStringFromPref(IMEI).getBytes(StandardCharsets.US_ASCII);
-            byte[] imeiSend = new byte[imei.length+2];
+            byte[] imeiSend = new byte[imei.length+1];
             imeiSend[0] = BYTE_MOBILE_ONE;
-            imeiSend[1] = BYTE_MOBILE_TWO;
             for (int i = 0; i <imei.length ; i++) {
-                imeiSend[i+2] = imei[i];
+                imeiSend[i+1] = imei[i];
             }
             sockOut.writeShort(imeiSend.length);
             sockOut.write(imeiSend);
@@ -176,12 +175,14 @@ public class TimerTaskToServer extends TimerTask {
                     /**I catch the expiration at the end of the readable bytes*/
                 }
                 if (response != MINUS_ONE) {
+                    System.out.println("!!!!!!!!!!!!Send: \n"+bytesToHex(AVLpacket));
                     deleteNotification();
                     //result = true;
                     break;
                 }
             }
         }catch (IOException e) {
+            System.out.println("!!!!!!!!!!!!Send: EXCEPTION: " + e.getMessage());
             createNotification(service,false,true,R.mipmap.min_icon_transparent,R.drawable.icon,
                     R.string.notification_ticker_task_server_connect,R.string.notification_title_task_server_connect,R.string.notification_message_task_server_connect);
             response = DEF_VALUE_NULL;
