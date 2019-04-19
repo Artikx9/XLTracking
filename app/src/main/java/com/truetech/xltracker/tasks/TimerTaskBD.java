@@ -204,7 +204,7 @@ public class TimerTaskBD extends TimerTask {
                 daos.writeByte(satellitesInFix);
             }
             if (prefs[4]) {//speed
-                float speed = loc.getSpeed();
+                float speed = (int) ((loc.getSpeed()*3600)/1000);
                 daos.writeShort((int) speed);
             }
 

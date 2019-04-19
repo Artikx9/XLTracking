@@ -140,13 +140,8 @@ public class TimerTaskToServer extends TimerTask {
             socket.setSoTimeout(SOCKET_TIMEOUT);
             sockOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
             byte[] imei = getStringFromPref(IMEI).getBytes(StandardCharsets.US_ASCII);
-            byte[] imeiSend = new byte[imei.length+1];
-            imeiSend[0] = BYTE_MOBILE_ONE;
-            for (int i = 0; i <imei.length ; i++) {
-                imeiSend[i+1] = imei[i];
-            }
-            sockOut.writeShort(imeiSend.length);
-            sockOut.write(imeiSend);
+            sockOut.writeShort(imei.length);
+            sockOut.write(imei);
             sockOut.flush();
             request = MINUS_ONE;
             sockIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
