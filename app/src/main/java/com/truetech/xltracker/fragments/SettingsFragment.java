@@ -1,10 +1,13 @@
 package com.truetech.xltracker.fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.SwitchPreference;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +34,8 @@ public class SettingsFragment extends PreferenceFragment {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.settings);
         flagRestartService=false;
+        SwitchPreference onSwitch = (SwitchPreference) findPreference(getString(R.string.key_switch_service));
+
         initEditText();
     }
 

@@ -37,6 +37,7 @@
     <string name="on">вкл</string>
     <string name="off">выкл</string>
     <string name="listView_sat">Кол-во спутников:</string>
+    <string name="listView_speed">Скорость: </string>
     <string name="notification_ticker_task_server_imei">Внимание!Не зарегистрирован IMEI.</string>
     <string name="notification_title_task_server_imei">Не зарегистрирован IMEI.</string>
     <string name="notification_message_task_server_imei">Обратитесь в службу поддержки.</string>

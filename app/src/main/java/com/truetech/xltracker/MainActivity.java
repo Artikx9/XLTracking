@@ -23,7 +23,7 @@ import java.util.List;
 import static com.truetech.xltracker.Utils.CheckPermissions.*;
 import static com.truetech.xltracker.Utils.Constant.*;
 import static com.truetech.xltracker.Utils.Util.*;
-import static com.truetech.xltracker.listener.SatellitesInfo.satellitesInFix;
+import static com.truetech.xltracker.listener.SatellitesInfo.*;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -156,6 +156,7 @@ public class MainActivity extends AppCompatActivity {
         dataListView.add(getString(R.string.listView_data)+(isServiceRunningInForeground(this,TrackerService.class) ? getString(R.string.on) : getString(R.string.off)));
         dataListView.add(getString(R.string.listView_imei)+imei);
         dataListView.add(getString(R.string.listView_sat)+satellitesInFix);
+        dataListView.add(getString(R.string.listView_speed) +speed);
         adapter=new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, dataListView);
         lvMain= findViewById(R.id.key_listView_main);
         if(adapter != null)

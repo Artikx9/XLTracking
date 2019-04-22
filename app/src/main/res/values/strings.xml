@@ -51,6 +51,7 @@
     <string name="on">on</string>
     <string name="off">off</string>
     <string name="listView_sat">Number of satellites:</string>
+    <string name="listView_speed">Speed: </string>
     <string name="notification_ticker_task_server_imei">Caution!Unregistered IMEI.</string>
     <string name="notification_title_task_server_imei">Unregistered IMEI.</string>
     <string name="notification_message_task_server_imei">Please contact support.</string>

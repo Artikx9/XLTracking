@@ -22,6 +22,8 @@ public class SatellitesInfo implements GpsStatus.Listener {
     private LocationManager locManager = null;
     private TrackerService service = null;
     public static volatile int satellitesInFix = 0;
+    public static volatile float speed = 0;
+
 
     @SuppressLint("MissingPermission")
     public SatellitesInfo(TrackerService service) {
@@ -42,8 +44,8 @@ public class SatellitesInfo implements GpsStatus.Listener {
                 }
             }
         }
-        //dataListView.set(2,getContext().getString(R.string.listView_sat)+satellitesInFix);
         refreshAdapter(2,getContext().getString(R.string.listView_sat)+satellitesInFix);
+        refreshAdapter(3,getContext().getString(R.string.listView_speed) +speed);
         if (satellitesInFix>=4 && !service.getCurrentProvider().equals(LocationManager.GPS_PROVIDER)){
             locManager.removeUpdates(locListener);
             locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,getIntFromPref(R.string.key_reg_data), DEF_VALUE_NULL,locListener);

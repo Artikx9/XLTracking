@@ -2,6 +2,8 @@ package com.truetech.xltracker.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import com.truetech.xltracker.R;
 import com.truetech.xltracker.fragments.SettingsFragment;
@@ -15,11 +17,13 @@ import static com.truetech.xltracker.Utils.Util.isServiceRunningInForeground;
 
 public class SettingsActivity extends AppCompatActivity {
     private SettingsFragment fragment;
+    private Preference switchOnOff;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
         fragment = new SettingsFragment();
         getFragmentManager().beginTransaction().replace(R.id.activity_settings, fragment).commit();
     }

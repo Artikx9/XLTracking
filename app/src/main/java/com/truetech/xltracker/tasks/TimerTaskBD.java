@@ -12,12 +12,12 @@ import android.util.Log;
 import com.truetech.xltracker.R;
 import com.truetech.xltracker.data.DBHelper;
 import com.truetech.xltracker.listener.ILocListener;
+import com.truetech.xltracker.listener.SatellitesInfo;
 import com.truetech.xltracker.service.TrackerService;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
-import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 import java.util.TimerTask;
 
@@ -25,7 +25,7 @@ import static com.truetech.xltracker.Utils.Constant.*;
 import static com.truetech.xltracker.Utils.Util.*;
 import static com.truetech.xltracker.listener.AzimuthSensorListener.azimuth;
 import static com.truetech.xltracker.listener.MyPhoneStateListener.strength;
-import static com.truetech.xltracker.listener.SatellitesInfo.satellitesInFix;
+import static com.truetech.xltracker.listener.SatellitesInfo.*;
 
 /**
  * Created by Ajwar on 12.06.2017.
@@ -36,6 +36,9 @@ public class TimerTaskBD extends TimerTask {
     private DBHelper dbHelper;
     private long timeCreateNotif = DEF_VALUE_NULL;
     private boolean existNotification = false;
+
+    private Location lastLocation = null;
+    private double calculatedSpeed = 0;
 
     public TimerTaskBD(TrackerService service) {
         this.service = service;
@@ -204,8 +207,11 @@ public class TimerTaskBD extends TimerTask {
                 daos.writeByte(satellitesInFix);
             }
             if (prefs[4]) {//speed
-                float speed = (int) ((loc.getSpeed()*3600)/1000);
+                float speed = getSpeed(loc);
+                SatellitesInfo.speed = speed;
                 daos.writeShort((int) speed);
+
+
             }
 
             /**IO Element*/
@@ -294,6 +300,20 @@ public class TimerTaskBD extends TimerTask {
         long time = System.currentTimeMillis() / 1000 - DIFF_UNIX_TIME;
         return  ByteBuffer.allocate(8).putFloat(time).array();
     }
+
+
+    private float getSpeed(Location loc){
+        if(lastLocation != null){
+        double elapsedTime = (loc.getTime() - lastLocation.getTime()) / 1_000; // Convert milliseconds to seconds
+            if ( elapsedTime == 0.0) calculatedSpeed = 0;
+            else
+        calculatedSpeed = lastLocation.distanceTo(loc) / elapsedTime;
+        }
+        this.lastLocation = loc;
+       return (float) ((loc.hasSpeed() && loc.getSpeed()>0 ? loc.getSpeed() : calculatedSpeed)*3.6);
+    }
+
+
 }
 
 
