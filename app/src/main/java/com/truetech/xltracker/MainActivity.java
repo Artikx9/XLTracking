@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
         dataListView.add(getString(R.string.listView_speed) +speed);
         adapter=new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, dataListView);
         lvMain= findViewById(R.id.key_listView_main);
-        if(adapter != null)
+        if(adapter != null && lvMain != null)
         lvMain.setAdapter(adapter);
     }
 
