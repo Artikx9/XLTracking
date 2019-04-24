@@ -183,8 +183,8 @@ public class TimerTaskBD extends TimerTask {
         if(prefs[6]) N1++;
         if(prefs[7]) N2++;
         if(prefs[8]) N1++;
-//        N1++; // speed ==0 id239=0
-//        N2++; // speed id24
+        N1++; // speed ==0 id239=0
+        N2++; // speed id24
         try {
             float speed = getSpeed(loc);
             daos.write(getTimestamp());
@@ -226,19 +226,19 @@ public class TimerTaskBD extends TimerTask {
                 daos.writeByte(98);
                 daos.writeByte(getBatteryPercentage(service));//write battery level percentage
             }
-//            //speed ==0 and > 0
-//            daos.writeByte(0xEF);
-//            if ((int) speed == 0) {
-//                daos.writeByte(0x00);
-//            } else {
-//                daos.writeByte(0x01);
-//            }
+            //speed ==0 and > 0
+            daos.writeByte(0xEF);
+            if ((int) speed == 0) {
+                daos.writeByte(0x00);
+            } else {
+                daos.writeByte(0x01);
+            }
 
             daos.writeByte(N2); //  IO elements, which value length is 2 Bytes
 
-//            //speed id 24
-//            daos.writeByte(0x18);
-//            daos.writeByte((int)speed);
+            //speed id 24
+            daos.writeByte(0x18);
+            daos.writeShort((int)speed);
 
             if (prefs[5]) {//loc_area_code
                 int[] array = getLacAndCid();             // array[1]cell id
